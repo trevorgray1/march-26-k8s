@@ -1,0 +1,30 @@
+name: DevSecOps Pipeline
+
+on: [push]
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image
+        run: docker build -t devsecops-demo .
+
+      - name: Run Snyk scan (SAST + container)
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: devsecops-demo
+
+      - name: Push to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker tag devsecops-demo ${{ secrets.DOCKER_USERNAME }}/devsecops-demo
+          docker push ${{ secrets.DOCKER_USERNAME }}/devsecops-demo
