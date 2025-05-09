@@ -1,6 +1,10 @@
-name: DevSecOps Pipeline
+name: DevSecOps CI/CD
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # ✅ Enables manual trigger from GitHub UI
 
 jobs:
   build-and-scan:
