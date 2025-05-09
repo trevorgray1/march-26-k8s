@@ -2,6 +2,9 @@ name: DevSecOps Pipeline
 
 on: [push]
 
+      - main
+  workflow_dispatch:  # ✅ Enables manual trigger from GitHub U
+
 jobs:
   build-and-scan:
     runs-on: ubuntu-latest
