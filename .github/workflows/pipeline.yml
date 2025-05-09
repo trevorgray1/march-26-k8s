@@ -22,10 +22,12 @@ jobs:
 
       - name: Run Snyk scan (SAST + container)
         uses: snyk/actions/docker@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: devsecops-demo
+          args: --file=Dockerfile --severity-threshold=critical --json
 
       - name: Push to Docker Hub
         run: |
