@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: app
-        image: your-dockerhub-user/devsecops-demo
+        image: trevorgray1985/devsecops-demo:latest
         ports:
         - containerPort: 5000
