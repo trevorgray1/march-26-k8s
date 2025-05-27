@@ -1,92 +1,126 @@
-# DevSecOps Pipeline Demo
+# DevSecOps Demo on AWS EKS
 
-This is a complete example of a DevSecOps pipeline that:
-- Deploys a simple Python Flask web app
-- Uses GitHub Actions for CI/CD
-- Integrates Snyk for vulnerability scanning
-- Builds and pushes a Docker image
-- Deploys to Kubernetes (Minikube or managed)
+This project demonstrates a complete DevSecOps pipeline for deploying a containerized Python web app to an AWS-managed Kubernetes cluster (EKS), with security scanning, CI/CD, and infrastructure-as-code.
 
 ---
 
-## 🛠️ Project Structure
+## 🚀 Features
 
-.
-├── app.py # Simple Flask web app
-├── requirements.txt # Python dependencies
-├── Dockerfile # Containerization
-├── .github/
-│ └── workflows/
-│ └── pipeline.yml # GitHub Actions CI/CD
-└── k8s/
-└── deployment.yaml # Kubernetes deployment
+- Containerized Python app  
+- GitHub Actions CI/CD pipeline  
+- Snyk vulnerability scanning  
+- Kubernetes manifests for deployment  
+- Terraform-managed AWS infrastructure (EKS, VPC)  
+- Optional diagrams-as-code support  
+
 ---
 
-## 🚀 Quick Start
+## 📁 Project Structure
 
-### 1. Build and Run Locally
+```
+dev-demos/
+├── app.py               # Flask or FastAPI web app
+├── Dockerfile           # Container spec
+├── requirements.txt     # Python dependencies
+├── k8s/                 # Kubernetes YAMLs (deployment, service)
+├── .github/             # GitHub Actions workflow
+├── terraform/           # Terraform config for EKS & VPC
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── versions.tf
+│   └── outputs.tf
+├── README.md
+└── .git/
+```
+
+---
+
+## 🛠️ Prerequisites
+
+- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)  
+- [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)  
+- [Terraform](https://developer.hashicorp.com/terraform/downloads)  
+- [kubectl](https://kubernetes.io/docs/tasks/tools/)  
+- Docker  
+- GitHub account (for GitHub Actions)  
+
+---
+
+## 🧱 Infrastructure Setup (Terraform)
 
 ```bash
-docker build -t devsecops-demo .
-docker run -p 5000:5000 devsecops-demo
+cd terraform
+terraform init
+terraform plan
+terraform apply
+```
 
-Push to GitHub
+This provisions:
+- A new VPC
+- An EKS cluster with managed node group
+- IAM roles and networking
 
-    Create a GitHub repo
+Once complete, configure `kubectl`:
 
-    Push this code to it:
+```bash
+aws eks --region us-east-1 update-kubeconfig --name devsecops-demo
+kubectl get nodes
+```
 
-git init
-git remote add origin https://github.com/your-username/your-repo.git
-git add .
-git commit -m "Initial commit"
-git push -u origin main
+---
 
-dd GitHub Secrets
+## 🧪 Build, Scan & Deploy (CI/CD)
 
-In your repo:
+1. Push changes to GitHub  
+2. GitHub Actions workflow:  
+   - Builds Docker image  
+   - Runs `snyk test` on Docker image  
+   - Pushes to Docker Hub (if no criticals)  
+   - Applies Kubernetes manifests  
 
-    Go to Settings → Secrets and variables → Actions
+Manual trigger (if needed):
 
-    Click "New repository secret" and add the following:
+```bash
+gh workflow run main.yml --repo your-user/dev-demos
+```
 
-Name	Description
-DOCKER_USERNAME	Your Docker Hub username
-DOCKER_PASSWORD	Your Docker Hub password or token
-SNYK_TOKEN	Snyk API token from https://snyk.io
+---
 
-Let CI/CD Pipeline Run
+## 📦 Kubernetes Deployment (Manual Option)
 
-When you push to the main branch:
-
-    GitHub Actions will:
-
-        Build the Docker image
-
-        Run a Snyk security scan
-
-        Push the image to Docker Hub
-
-Check your Actions tab for status.
-
-Deploy to Kubernetes
-
-For local testing using Minikube:
-
-minikube start
+```bash
 kubectl apply -f k8s/deployment.yaml
-kubectl expose deployment devsecops-demo --type=NodePort --port=80 --target-port=5000
-minikube service devsecops-demo
+kubectl apply -f k8s/service.yaml
+```
 
-Replace image paths if deploying to GKE, EKS, or another cloud platform.
+---
 
+## 🔐 Security
 
-DevSecOps Features
+- Snyk CLI used to scan Docker images before deployment.  
+- Fail build on critical vulnerabilities.  
 
-    CI/CD: GitHub Actions
+---
 
-    Security Scanning: Snyk (SAST + container scan)
+## 🧹 Tear Down (Avoid Charges)
 
-    Containerization: Docker
+```bash
+cd terraform
+terraform destroy
+```
 
-    Orchestration: Kubernetes
+This deletes the EKS cluster, VPC, and related resources.
+
+---
+
+## 📌 TODO
+
+- [ ] Add Ingress & DNS (e.g., AWS ALB)  
+- [ ] Add GitHub OIDC authentication to Terraform  
+- [ ] Monitor with Prometheus/Grafana  
+
+---
+
+## 📄 License
+
+MIT License
