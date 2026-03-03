@@ -1,0 +1,34 @@
+# Node
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+/app/frontend/node_modules/
+/app/backend/node_modules/
+
+# Build output
+/dist
+/build
+
+# dotenv environment variables
+.env
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+# Docker
+**/*.pid
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
