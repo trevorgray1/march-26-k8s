@@ -26,7 +26,7 @@ resource "kubernetes_deployment" "app" {
         container {
           name  = "devsecops-demo"
           image = "trevorgray1985/devsecops-demo:latest"
-          ports {
+          port {
             container_port = 5000
           }
         }

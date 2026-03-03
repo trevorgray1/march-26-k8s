@@ -1,0 +1,20 @@
+name: CI/CD
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build backend Docker image
+        run: docker build -f docker/backend.Dockerfile -t backend .
+      - name: Build frontend Docker image
+        run: docker build -f docker/frontend.Dockerfile -t frontend .
+      # Add steps to push images to ECR and deploy to EKS
+      # See README for details
