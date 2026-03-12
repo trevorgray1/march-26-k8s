@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "example-app.fullname" . }}
+  annotations:
+    # TODO: Add/verify correct AWS ALB ingress annotations for your use case
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    # alb.ingress.kubernetes.io/certificate-arn: <YOUR-CERT-ARN> # for TLS
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "example-app.fullname" . }}
+                port:
+                  number: {{ .Values.service.port }}
+  # tls:
+  #   - hosts:
+  #       - <YOUR-HOST>
+  #     secretName: <YOUR-TLS-SECRET>

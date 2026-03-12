@@ -1,126 +1,47 @@
-# DevSecOps Demo on AWS EKS
+# Cost-Saving Recommendations
 
-This project demonstrates a complete DevSecOps pipeline for deploying a containerized Python web app to an AWS-managed Kubernetes cluster (EKS), with security scanning, CI/CD, and infrastructure-as-code.
+- Use small or spot EC2 instances for EKS node groups (configure in Terraform)
+- Set low default replica counts in Helm chart (e.g., replicaCount: 1 for dev/test)
+- Use ClusterIP services by default; only use LoadBalancer when necessary
+- Disable or scale down monitoring components (Prometheus, Grafana) when not needed
+- Use Terraform variables for scaling and instance types for easy adjustment
+- Clean up unused ECR repositories and images regularly
 
----
+# Teardown Process
 
-## 🚀 Features
+To destroy all AWS infrastructure (EKS, VPC, ECR, etc.):
+1. `cd terraform`
+2. `terraform destroy` (review the plan before confirming)
 
-- Containerized Python app  
-- GitHub Actions CI/CD pipeline  
-- Snyk vulnerability scanning  
-- Kubernetes manifests for deployment  
-- Terraform-managed AWS infrastructure (EKS, VPC)  
-- Optional diagrams-as-code support  
+To remove Kubernetes resources deployed with Helm:
+1. `helm uninstall <release-name>` for each Helm release
 
----
+For manually applied manifests:
+1. `kubectl delete -f <manifest.yaml>`
 
-## 📁 Project Structure
+**Reminders:**
+- Double-check for persistent volumes, S3 buckets, or other resources that may not be deleted automatically
+- Clean up backend state (S3, DynamoDB) if no longer needed
+# Production-Ready EKS Platform Scaffold
 
-```
-dev-demos/
-├── app.py               # Flask or FastAPI web app
-├── Dockerfile           # Container spec
-├── requirements.txt     # Python dependencies
-├── k8s/                 # Kubernetes YAMLs (deployment, service)
-├── .github/             # GitHub Actions workflow
-├── terraform/           # Terraform config for EKS & VPC
-│   ├── main.tf
-│   ├── variables.tf
-│   ├── versions.tf
-│   └── outputs.tf
-├── README.md
-└── .git/
-```
+## What’s included
+- Terraform for VPC, EKS, node groups, IRSA, ECR, backend
+- Kubernetes manifests (Deployment, Service, ServiceAccount, ConfigMap)
+- Helm chart scaffolding and templates
+- Ingress with ALB annotations (verify in AWS docs)
+- cert-manager Issuer/ClusterIssuer YAML
+- kube-prometheus-stack values and ServiceMonitor
+- GitHub Actions pipeline: build → scan → push → deploy
 
----
+## What you must decide/configure
+- VPC/subnet CIDRs, node types, namespaces, ingress design
+- IAM policies, pod security, TLS, secrets
+- AWS/Kubernetes annotation correctness (check docs)
+- Manual testing: terraform plan, kubectl logs, helm dry-run
+- Tradeoffs: IRSA vs node roles, Helm vs Kustomize, etc.
 
-## 🛠️ Prerequisites
-
-- [AWS CLI v2](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)  
-- [eksctl](https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html)  
-- [Terraform](https://developer.hashicorp.com/terraform/downloads)  
-- [kubectl](https://kubernetes.io/docs/tasks/tools/)  
-- Docker  
-- GitHub account (for GitHub Actions)  
-
----
-
-## 🧱 Infrastructure Setup (Terraform)
-
-```bash
-cd terraform
-terraform init
-terraform plan
-terraform apply
-```
-
-This provisions:
-- A new VPC
-- An EKS cluster with managed node group
-- IAM roles and networking
-
-Once complete, configure `kubectl`:
-
-```bash
-aws eks --region us-east-1 update-kubeconfig --name devsecops-demo
-kubectl get nodes
-```
-
----
-
-## 🧪 Build, Scan & Deploy (CI/CD)
-
-1. Push changes to GitHub  
-2. GitHub Actions workflow:  
-   - Builds Docker image  
-   - Runs `snyk test` on Docker image  
-   - Pushes to Docker Hub (if no criticals)  
-   - Applies Kubernetes manifests  
-
-Manual trigger (if needed):
-
-```bash
-gh workflow run main.yml --repo your-user/dev-demos
-```
-
----
-
-## 📦 Kubernetes Deployment (Manual Option)
-
-```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
-
----
-
-## 🔐 Security
-
-- Snyk CLI used to scan Docker images before deployment.  
-- Fail build on critical vulnerabilities.  
-
----
-
-## 🧹 Tear Down (Avoid Charges)
-
-```bash
-cd terraform
-terraform destroy
-```
-
-This deletes the EKS cluster, VPC, and related resources.
-
----
-
-## 📌 TODO
-
-- [ ] Add Ingress & DNS (e.g., AWS ALB)  
-- [ ] Add GitHub OIDC authentication to Terraform  
-- [ ] Monitor with Prometheus/Grafana  
-
----
-
-## 📄 License
-
-MIT License
+## Reminders
+- Review all TODOs and placeholders
+- Validate security and compliance for your org
+- Test in a non-prod environment first
+- Keep code modular and idiomatic

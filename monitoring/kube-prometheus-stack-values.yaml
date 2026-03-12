@@ -1,0 +1,12 @@
+# Minimal example, customize as needed
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    podMonitorSelector: {}
+grafana:
+  enabled: true
+  adminPassword: prom-operator
+  service:
+    type: LoadBalancer
+    port: 80

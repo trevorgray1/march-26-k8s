@@ -1,0 +1,10 @@
+replicaCount: 2
+image:
+  repository: <YOUR_ECR_IMAGE>
+  tag: latest
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 80
+env:
+  EXAMPLE_KEY: "example-value"
