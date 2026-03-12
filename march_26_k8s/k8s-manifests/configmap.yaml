@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-app-config
+  # TODO: Set namespace if not default
+data:
+  EXAMPLE_KEY: "example-value"
